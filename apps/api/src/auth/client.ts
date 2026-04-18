@@ -33,7 +33,9 @@ export async function createOAuthClient(): Promise<NodeOAuthClient> {
       clientMetadata: {
         client_id: loopbackClientId(),
         client_name: "asq.fyi (dev)",
-        client_uri: env.PUBLIC_WEB_URL,
+        // For the loopback client, client_uri is constrained to match the
+        // loopback host on the client_id — keep it on http://localhost.
+        client_uri: "http://localhost",
         redirect_uris: [`${env.PUBLIC_API_URL}/auth/callback`],
         scope: SCOPE,
         grant_types: ["authorization_code", "refresh_token"],
@@ -54,7 +56,11 @@ export async function createOAuthClient(): Promise<NodeOAuthClient> {
     clientMetadata: {
       client_id: `${env.PUBLIC_API_URL}/client-metadata.json`,
       client_name: "asq.fyi",
-      client_uri: env.PUBLIC_WEB_URL,
+      // client_uri must share the same origin as client_id per the ATProto
+      // OAuth spec. Keep it on the API host; the consent-screen link goes
+      // there but PUBLIC_WEB_URL is still where the user ends up after the
+      // /auth/callback redirect.
+      client_uri: env.PUBLIC_API_URL,
       redirect_uris: [`${env.PUBLIC_API_URL}/auth/callback`],
       scope: SCOPE,
       grant_types: ["authorization_code", "refresh_token"],
