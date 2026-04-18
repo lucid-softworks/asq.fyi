@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --env-file=../../.env run -- vite dev",
-    "build": "vite build",
+    "build": "vite build && nitro build",
     "start": "bun run .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },
