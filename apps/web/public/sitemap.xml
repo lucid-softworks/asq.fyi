@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://asq.fyi/</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://asq.fyi/?sort=top</loc>
+    <changefreq>hourly</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/?sort=unanswered</loc>
+    <changefreq>hourly</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/?sort=trending</loc>
+    <changefreq>hourly</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/ask</loc>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/search</loc>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/privacy</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://asq.fyi/login</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>

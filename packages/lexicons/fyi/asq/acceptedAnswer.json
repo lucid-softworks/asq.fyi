@@ -1,0 +1,19 @@
+{
+  "lexicon": 1,
+  "id": "fyi.asq.acceptedAnswer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["question", "answer", "createdAt"],
+        "properties": {
+          "question": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+          "answer": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "lexicon": 1,
+  "id": "fyi.asq.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "body", "createdAt"],
+        "properties": {
+          "subject": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+          "parent": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+          "body": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}

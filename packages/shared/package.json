@@ -1,0 +1,19 @@
+{
+  "name": "@asq/shared",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas.ts"
+  },
+  "private": true,
+  "scripts": {
+    "build": "echo 'shared: typechecked only, no emit'",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

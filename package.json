@@ -1,0 +1,18 @@
+{
+  "name": "asq",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter='@asq/api' --filter='@asq/web' dev",
+    "dev:ingester": "bun run --cwd apps/api dev:ingester",
+    "build": "bun run --filter='@asq/lexicons' build && bun run --filter='@asq/shared' build && bun run --filter='@asq/web' build",
+    "typecheck": "bun run --filter='@asq/api' --filter='@asq/web' --filter='@asq/lexicons' --filter='@asq/shared' typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

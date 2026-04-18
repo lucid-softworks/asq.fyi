@@ -1,0 +1,25 @@
+{
+  "name": "@asq/lexicons",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./generated": "./src/generated/index.ts",
+    "./generated/*": "./src/generated/*.ts"
+  },
+  "scripts": {
+    "build": "lex gen-api --yes src/generated fyi/asq/*.json com/atproto/repo/*.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@atproto/lexicon": "^0.6.2",
+    "@atproto/xrpc": "^0.7.7",
+    "multiformats": "^13.4.2"
+  },
+  "devDependencies": {
+    "@atproto/lex-cli": "^0.9.9"
+  }
+}
