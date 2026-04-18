@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["bun"]
+
+[phases.install]
+cmds = ["bun install --frozen-lockfile"]
+
+# Default start is api. Ingester + web override NIXPACKS_START_CMD per service.
+# The web service also sets NIXPACKS_BUILD_CMD = "bun run --filter '@asq/web' build"
+[start]
+cmd = "bun run apps/api/src/index.ts"
