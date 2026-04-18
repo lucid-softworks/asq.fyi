@@ -1,0 +1,17 @@
+{
+  "name": "@asq/ingester",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --env-file=../../.env run --watch src/ingester.ts",
+    "start": "bun run src/ingester.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@asq/server": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.13"
+  }
+}

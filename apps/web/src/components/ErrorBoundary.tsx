@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 
 interface Props {
   children: ReactNode;
@@ -41,8 +41,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
           </h2>
           <p style={{ marginTop: 0 }}>
             This page hit an error while rendering. It's been logged. Try
-            reloading, or head{" "}
-            <Link to="/">back home</Link>.
+            reloading, or head <Link to="/">back home</Link>.
           </p>
           {import.meta.env.DEV ? (
             <pre

@@ -1,12 +1,21 @@
-import { Link } from "react-router-dom";
-import { useMeta } from "../lib/meta";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
-export default function Privacy() {
-  useMeta({
-    title: "Privacy — asq.fyi",
-    description:
-      "How asq.fyi handles analytics: anonymous, first-party, no third parties.",
-  });
+export const Route = createFileRoute("/privacy")({
+  head: () => ({
+    meta: [
+      { title: "Privacy — asq.fyi" },
+      {
+        name: "description",
+        content:
+          "How asq.fyi handles analytics: anonymous, first-party, no third parties.",
+      },
+    ],
+  }),
+  component: PrivacyRoute,
+});
+
+function PrivacyRoute() {
   return (
     <>
       <div className="crumbs">
@@ -123,15 +132,10 @@ function PrivacySection({
 }: {
   num: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <section
-      style={{
-        borderTop: "var(--bd)",
-        padding: "var(--s-5) 0",
-      }}
-    >
+    <section style={{ borderTop: "var(--bd)", padding: "var(--s-5) 0" }}>
       <h2
         style={{
           display: "flex",

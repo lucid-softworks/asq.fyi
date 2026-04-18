@@ -4,30 +4,36 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "start": "bun run server.ts",
-    "preview": "vite preview",
+    "dev": "bun --env-file=../../.env run -- vite dev",
+    "build": "vite build",
+    "start": "bun run .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@asq/lexicons": "workspace:*",
+    "@asq/server": "workspace:*",
     "@asq/shared": "workspace:*",
+    "@atproto/oauth-client-node": "^0.3.17",
     "@hookform/resolvers": "^5.2.2",
+    "drizzle-orm": "^0.45.2",
     "@tanstack/react-query": "^5.99.0",
+    "@tanstack/react-router": "^1.133.20",
+    "@tanstack/react-start": "^1.133.20",
     "date-fns": "^4.1.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "nitro": "^3.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-hook-form": "^7.72.1",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.14.1",
     "remark-gfm": "^4.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.3",
-    "vite": "^5.4.10"
+    "vite": "^6.0.0",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

@@ -1,17 +1,31 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  createFileRoute,
+  useNavigate,
+} from "@tanstack/react-router";
 import { QuestionComposer } from "../components/QuestionComposer";
 import { useSession } from "../lib/session";
-import { questionHref } from "../lib/atUri";
+import { parseAtUri } from "../lib/atUri";
 
-export default function Ask() {
+export const Route = createFileRoute("/ask")({
+  head: () => ({
+    meta: [{ title: "Ask a question — asq.fyi" }],
+  }),
+  component: AskRoute,
+});
+
+function AskRoute() {
   const navigate = useNavigate();
   const session = useSession();
 
   useEffect(() => {
     if (session.isLoading) return;
     if (!session.data) {
-      navigate(`/login?next=${encodeURIComponent("/ask")}`, { replace: true });
+      void navigate({
+        to: "/login",
+        search: { next: "/ask" },
+        replace: true,
+      });
     }
   }, [session.isLoading, session.data, navigate]);
 
@@ -66,12 +80,19 @@ export default function Ask() {
         </div>
       </div>
 
-      <div
-        className="wrap-1100"
-        style={{ padding: "var(--s-7) var(--s-5)" }}
-      >
+      <div className="wrap-1100" style={{ padding: "var(--s-7) var(--s-5)" }}>
         <QuestionComposer
-          onPosted={(result) => navigate(questionHref(result.uri))}
+          onPosted={(result) => {
+            const parsed = parseAtUri(result.uri);
+            if (parsed) {
+              void navigate({
+                to: "/q/$did/$rkey",
+                params: { did: parsed.did, rkey: parsed.rkey },
+              });
+            } else {
+              void navigate({ to: "/" });
+            }
+          }}
         />
       </div>
     </>

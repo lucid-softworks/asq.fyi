@@ -1,8 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 
 export function TagBadge({ tag }: { tag: string }) {
   return (
-    <Link to={`/tag/${encodeURIComponent(tag)}`} className="chip topic">
+    <Link
+      to="/tag/$tag"
+      params={{ tag }}
+      className="chip topic"
+    >
       {tag}
     </Link>
   );

@@ -4,11 +4,11 @@ A Q&A platform built on the AT Protocol. Questions, answers, votes, and comments
 
 ## Stack
 
-- **Backend:** Bun + Elysia + Drizzle + Postgres
-- **Frontend:** React + Vite + Tailwind v4
+- **Web + API:** TanStack Start (Vite + Nitro SSR, React 19)
+- **Database:** Postgres via Drizzle
 - **Auth:** ATProto OAuth (no app passwords)
 - **Ingest:** Jetstream WebSocket worker → Postgres cache
-- **Hosting:** Railway (api, ingester, web as three services)
+- **Hosting:** Railway (web + ingester as two services)
 
 ## Architecture
 
@@ -18,27 +18,25 @@ A Q&A platform built on the AT Protocol. Questions, answers, votes, and comments
   (any host) <-+| (user's chosen    |<-------+ user browser
                 |  handle -> PDS)   |        |
                 +---------+---------+        |
-                          ^                  | cookie-auth XHR
+                          ^                  | cookie-auth fetch
                           |  createRecord    v
-                +---------+---------+   +----+-------------+
-                |  apps/api         |<--+  apps/web (SPA)  |
-                |  Elysia + OAuth   |   |  Vite bundle     |
-                |  read/write       |   |  OG injector for |
-                |  routes           |   |  /q/:did/:rkey   |
-                +----+----+---------+   +------------------+
-                     ^    |
-                     |    | drizzle
-                     |    v
-  Jetstream WS ------+--> Postgres  <---+
-  (all fyi.asq.*)    |   (cache +       |
-                     |    analytics)    |
-                     |                  |
-                +----+----------+       |
-                |  ingester     |-------+
-                |  (same code-  |
-                |   base, sep.  |
-                |   process)    |
-                +---------------+
+                          |             +----+-------------+
+                          |             |  apps/web        |
+                          |             |  TanStack Start  |
+                          |             |  - SSR + head()  |
+                          |             |  - /api/* server |
+                          |             |    routes        |
+                          |             |  - /auth/*       |
+                          +-------------+    OAuth flow    |
+                                        +----+-------------+
+                                             |
+                                             | drizzle
+                                             v
+  Jetstream WS ---> +---------------+     Postgres
+  (all fyi.asq.*)   | apps/ingester |---> (cache +
+                    | (standalone   |     analytics)
+                    |  Bun process) |
+                    +---------------+
 ```
 
 Records of truth live on each user's PDS. Postgres is a rebuildable cache
@@ -47,10 +45,12 @@ populated by the Jetstream firehose.
 ## Layout
 
 ```
-apps/api/          Elysia HTTP API + OAuth + Jetstream ingester
-apps/web/          React SPA + OG-injecting static server
-packages/lexicons/ fyi.asq.* lexicon JSON + codegen output
-packages/shared/   shared zod input schemas
+apps/web/              TanStack Start app — UI + /api/* + /auth/* + /health
+apps/ingester/         Bun process consuming the Jetstream firehose
+packages/server/       Shared server code (db, atproto, analytics,
+                       jetstream, oauth) imported by apps/web + ingester
+packages/lexicons/     fyi.asq.* lexicon JSON + codegen output
+packages/shared/       Shared zod input schemas (client + server)
 ```
 
 ## Local development
@@ -70,62 +70,67 @@ packages/shared/   shared zod input schemas
 3. Copy `.env.example` → `.env` and fill in values:
    - `DATABASE_URL` — pointing at your local Postgres
    - `COOKIE_SECRET` — any 32+ byte secret
-   - `OAUTH_PRIVATE_KEY_1` — leave blank in dev; the API will generate an ephemeral ES256 key at `apps/api/.dev-oauth-key.pem` on first run
-4. Run the API + web concurrently:
+   - `OAUTH_PRIVATE_KEY_1` — leave blank in dev; the web app will
+     generate an ephemeral ES256 key at `packages/server/.dev-oauth-key.pem`
+     on first run
+4. Run the web app and the ingester:
    ```
-   bun run dev          # api on :3000, web on :5173
+   bun run dev          # web on :5173
    bun run dev:ingester # (second terminal) Jetstream ingester
    ```
 
-Visit <http://127.0.0.1:5173> — use `127.0.0.1` (not `localhost`) locally so ATProto OAuth's loopback-client rules accept the redirect URI.
+Visit <http://127.0.0.1:5173> — use `127.0.0.1` (not `localhost`) locally so
+ATProto OAuth's loopback-client rules accept the redirect URI.
 
 ### Key scripts
 
-| command                       | what it does                                       |
-|-------------------------------|----------------------------------------------------|
-| `bun run dev`                 | api + web with `--watch`                           |
-| `bun run dev:ingester`        | Jetstream worker                                   |
-| `bun run typecheck`           | tsc --noEmit across all workspaces                 |
-| `bun run build`               | lexicons + shared + web production build           |
-| `bun --cwd apps/api db:generate` | create migration from schema.ts diff            |
-| `bun --cwd apps/api db:migrate`  | apply migrations to DATABASE_URL                |
-| `bun --cwd apps/api db:studio`   | drizzle-kit studio for DB inspection            |
+| command                  | what it does                                   |
+|--------------------------|------------------------------------------------|
+| `bun run dev`            | TanStack Start web dev server with `--watch`   |
+| `bun run dev:ingester`   | Jetstream worker                               |
+| `bun run typecheck`      | tsc --noEmit across all workspaces             |
+| `bun run build`          | production build (lexicons + shared + web)     |
+| `bun run db:generate`    | create migration from schema.ts diff           |
+| `bun run db:migrate`     | apply migrations to DATABASE_URL               |
+| `bun run db:studio`      | drizzle-kit studio for DB inspection           |
 
 ## Env vars
 
-See `.env.example`. The API's `env.ts` validates with zod at boot and fails fast if anything required is missing.
+See `.env.example`. The `@asq/server` package's `env.ts` validates with zod
+at boot and fails fast if anything required is missing.
 
 ```
-# Shared
 NODE_ENV=development
 DATABASE_URL=postgres://...
-
-# API
-PUBLIC_API_URL=http://127.0.0.1:3000   # https://api.asq.fyi in prod
-PUBLIC_WEB_URL=http://127.0.0.1:5173   # https://asq.fyi in prod
+PUBLIC_API_URL=http://127.0.0.1:5173   # same origin as web in the unified app
+PUBLIC_WEB_URL=http://127.0.0.1:5173
 COOKIE_SECRET=change-me-to-32-bytes
 OAUTH_PRIVATE_KEY_1=                    # required in prod; PEM w/ \n escapes
 JETSTREAM_URL=wss://jetstream2.us-east.bsky.network/subscribe
-
-# Web
-VITE_API_URL=http://127.0.0.1:3000
 ```
 
 ## Deployment
 
-Three Railway services from the same repo + a Postgres plugin:
+Two Railway services from the same repo + a Postgres plugin:
 
-1. **api** — `bun run apps/api/src/index.ts`, domain `api.asq.fyi`
-2. **ingester** — `bun run apps/api/src/ingester.ts`, no public domain
-3. **web** — `bun run apps/web/server.ts`, domains `asq.fyi` + `www.asq.fyi`
+1. **web** — `bun run start:web`, domains `asq.fyi` + `www.asq.fyi` +
+   `api.asq.fyi` (all three on the same service now)
+2. **ingester** — `bun run start:ingester`, no public domain
 
-Deploy order on first setup: api → verify migrations → ingester → web.
+Build command at the repo root: `bun run build`.
+Start commands use the workspace scripts above.
 
-The production web service runs a small custom Bun static server (`apps/web/server.ts`) rather than `bunx serve`. It fetches `/api/questions/:uri` for `/q/:did/:rkey` and injects `og:title` / `og:description` / `article:author` / `article:tag` meta into the HTML shell, so Bluesky and Slack unfurl question URLs with a real preview. This is not SSR — React still renders on the client.
+TanStack Start's Nitro output at `apps/web/.output/server/index.mjs` is the
+web service's entrypoint. SSR renders `/q/:did/:rkey` with `og:title` /
+`og:description` / `article:author` / `article:tag` meta for Bluesky and
+Slack unfurls — replacing the previous string-injection static server.
+
+Deploy order on first setup: web → verify migrations → ingester.
 
 ## Privacy
 
-See [`/privacy`](https://asq.fyi/privacy). Analytics are first-party, anonymous, and described in full there.
+See [`/privacy`](https://asq.fyi/privacy). Analytics are first-party,
+anonymous, and described in full there.
 
 ## Deferred work
 

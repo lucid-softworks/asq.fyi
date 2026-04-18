@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 
-const BASE = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:3000";
-
 // Fires at most once per mounted (subjectUri, session) pair. Keeping this at
 // module scope (rather than component state) means rapid unmount/remount —
 // e.g. strict-mode double-render, hot reload — won't emit duplicate events.
@@ -27,12 +25,11 @@ export function trackView(
   if (sent.has(key)) return;
   sent.add(key);
 
-  const url = `${BASE}/api/analytics/view`;
+  const url = "/api/analytics/view";
   const body = JSON.stringify({ subjectUri, subjectType });
 
   if (sendBeacon(url, body)) return;
 
-  // Fallback: fetch with keepalive so in-flight requests survive navigation
   void fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -48,7 +45,7 @@ export function trackShare(
   subjectUri: string,
   subjectType: AnalyticsSubjectType,
 ): void {
-  const url = `${BASE}/api/analytics/share`;
+  const url = "/api/analytics/share";
   const body = JSON.stringify({ subjectUri, subjectType });
 
   if (sendBeacon(url, body)) return;

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { questionHref } from "../lib/atUri";
+import { Link } from "@tanstack/react-router";
+import { parseAtUri } from "../lib/atUri";
 import { compactNumber, relativeTime } from "../lib/format";
 import type { QuestionCard as Q } from "../lib/types";
 import { Avatar } from "./Avatar";
@@ -12,8 +12,8 @@ export function QuestionCard({
   question: Q;
   feedQueryKey?: readonly unknown[];
 }) {
-  void feedQueryKey; // not used here; cards are display-only in feeds
-  const href = questionHref(question.uri);
+  void feedQueryKey;
+  const parsed = parseAtUri(question.uri);
   const authorLabel = question.author.handle
     ? `@${question.author.handle}`
     : question.author.did.slice(0, 14) + "…";
@@ -38,7 +38,16 @@ export function QuestionCard({
       </div>
       <div>
         <h3 className="q-card__title">
-          <Link to={href}>{question.title}</Link>
+          {parsed ? (
+            <Link
+              to="/q/$did/$rkey"
+              params={{ did: parsed.did, rkey: parsed.rkey }}
+            >
+              {question.title}
+            </Link>
+          ) : (
+            <span>{question.title}</span>
+          )}
         </h3>
         <p className="q-card__body">{question.body}</p>
         {question.tags.length > 0 ? (
@@ -60,7 +69,8 @@ export function QuestionCard({
           <div style={{ textAlign: "left" }}>
             {question.author.handle ? (
               <Link
-                to={`/u/${encodeURIComponent(question.author.handle)}`}
+                to="/u/$handle"
+                params={{ handle: question.author.handle }}
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontSize: "var(--t-xs)",

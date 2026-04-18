@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import {
   Link,
-  NavLink,
   useLocation,
   useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+} from "@tanstack/react-router";
 import { useLogout, useSession } from "../lib/session";
 
 export function Header() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const [q, setQ] = useState(params.get("q") ?? "");
-  const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
+  const initialQ =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("q") ?? ""
+      : "";
+  const [q, setQ] = useState(initialQ);
+  const [navOpen, setNavOpen] = useState(false);
   const session = useSession();
   const logout = useLogout();
 
@@ -35,12 +36,18 @@ export function Header() {
           <span className="ext">.fyi</span>
         </Link>
         <nav className="site-nav">
-          <NavLink to="/" end>
+          <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "active" }}>
             Feed
-          </NavLink>
-          <NavLink to="/search">Search</NavLink>
-          <NavLink to="/ask">Ask</NavLink>
-          <NavLink to="/privacy">Privacy</NavLink>
+          </Link>
+          <Link to="/search" activeProps={{ className: "active" }}>
+            Search
+          </Link>
+          <Link to="/ask" activeProps={{ className: "active" }}>
+            Ask
+          </Link>
+          <Link to="/privacy" activeProps={{ className: "active" }}>
+            Privacy
+          </Link>
         </nav>
 
         <div
@@ -52,7 +59,9 @@ export function Header() {
             onSubmit={(e) => {
               e.preventDefault();
               const trimmed = q.trim();
-              if (trimmed) navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+              if (trimmed) {
+                void navigate({ to: "/search", search: { q: trimmed } });
+              }
             }}
             style={{ display: "none" }}
             className="header-search"
@@ -67,22 +76,30 @@ export function Header() {
               onChange={(e) => setQ(e.target.value)}
               placeholder="SEARCH…"
               className="input"
-              style={{ padding: "6px 10px", fontSize: "var(--t-xs)", fontFamily: "var(--font-mono)", letterSpacing: "0.08em" }}
+              style={{
+                padding: "6px 10px",
+                fontSize: "var(--t-xs)",
+                fontFamily: "var(--font-mono)",
+                letterSpacing: "0.08em",
+              }}
             />
           </form>
 
           {session.isLoading ? null : session.data ? (
             <>
-              <Link
-                to={
-                  session.data.handle
-                    ? `/u/${encodeURIComponent(session.data.handle)}`
-                    : "/"
-                }
-                className="btn btn--xs btn--ghost"
-              >
-                {handleLabel}
-              </Link>
+              {session.data.handle ? (
+                <Link
+                  to="/u/$handle"
+                  params={{ handle: session.data.handle }}
+                  className="btn btn--xs btn--ghost"
+                >
+                  {handleLabel}
+                </Link>
+              ) : (
+                <Link to="/" className="btn btn--xs btn--ghost">
+                  {handleLabel}
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => logout.mutate()}
@@ -120,23 +137,35 @@ export function Header() {
       {navOpen ? (
         <div id="mobile-nav" className="mobile-sheet">
           <nav aria-label="Mobile navigation">
-            <NavLink to="/" end>
+            <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "active" }}>
               Feed
-            </NavLink>
-            <NavLink to="/ask">Ask a question</NavLink>
-            <NavLink to="/search">Search</NavLink>
+            </Link>
+            <Link to="/ask" activeProps={{ className: "active" }}>
+              Ask a question
+            </Link>
+            <Link to="/search" activeProps={{ className: "active" }}>
+              Search
+            </Link>
             {session.data?.handle ? (
-              <NavLink to={`/u/${encodeURIComponent(session.data.handle)}`}>
+              <Link
+                to="/u/$handle"
+                params={{ handle: session.data.handle }}
+                activeProps={{ className: "active" }}
+              >
                 Your profile
-              </NavLink>
+              </Link>
             ) : null}
-            <NavLink to="/privacy">Privacy</NavLink>
+            <Link to="/privacy" activeProps={{ className: "active" }}>
+              Privacy
+            </Link>
             {session.data ? (
               <button type="button" onClick={() => logout.mutate()}>
                 Log out
               </button>
             ) : (
-              <NavLink to="/login">Sign in</NavLink>
+              <Link to="/login" activeProps={{ className: "active" }}>
+                Sign in
+              </Link>
             )}
           </nav>
         </div>

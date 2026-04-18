@@ -1,18 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { api } from "../lib/api";
 import { QuestionCard } from "../components/QuestionCard";
 import { QuestionListSkeleton } from "../components/Skeleton";
 import { EmptyState } from "../components/EmptyState";
 import { ErrorState } from "../components/ErrorState";
-import { useMeta } from "../lib/meta";
 
-export default function Search() {
-  const [params] = useSearchParams();
-  const q = (params.get("q") ?? "").trim();
-  useMeta({
-    title: q ? `Search: ${q} — asq.fyi` : "Search — asq.fyi",
-  });
+const searchSchema = z.object({
+  q: z.string().optional(),
+});
+
+export const Route = createFileRoute("/search")({
+  validateSearch: searchSchema,
+  head: () => ({
+    meta: [{ title: "Search — asq.fyi" }],
+  }),
+  component: SearchRoute,
+});
+
+function SearchRoute() {
+  const { q: qParam } = Route.useSearch();
+  const q = (qParam ?? "").trim();
 
   const res = useQuery({
     queryKey: ["search", q],

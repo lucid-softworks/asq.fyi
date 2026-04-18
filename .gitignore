@@ -8,9 +8,13 @@ build/
 .DS_Store
 .vscode/
 .idea/
-apps/web/dist/
-apps/api/drizzle/meta/_journal.json.bak
 coverage/
 .turbo/
 .bun/
-apps/api/.dev-oauth-key.pem
+
+# TanStack Start / Nitro build output
+apps/web/.nitro/
+apps/web/.output/
+
+# Dev-only ephemeral OAuth key (generated on first run if OAUTH_PRIVATE_KEY_1 unset)
+packages/server/.dev-oauth-key.pem

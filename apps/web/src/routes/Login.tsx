@@ -1,22 +1,33 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { api } from "../lib/api";
-import { useMeta } from "../lib/meta";
 
-export default function Login() {
-  const [params] = useSearchParams();
-  const error = params.get("error");
+const loginSearchSchema = z.object({
+  error: z.string().optional(),
+  next: z.string().optional(),
+});
+
+export const Route = createFileRoute("/login")({
+  validateSearch: loginSearchSchema,
+  head: () => ({
+    meta: [
+      { title: "Sign in — asq.fyi" },
+      {
+        name: "description",
+        content: "Sign in to asq.fyi with your ATProto handle.",
+      },
+    ],
+  }),
+  component: LoginRoute,
+});
+
+function LoginRoute() {
+  const { error } = Route.useSearch();
   const [handle, setHandle] = useState("");
-  useMeta({
-    title: "Sign in — asq.fyi",
-    description: "Sign in to asq.fyi with your ATProto handle.",
-  });
 
   return (
-    <div
-      className="wrap-980"
-      style={{ padding: "var(--s-8) var(--s-5)" }}
-    >
+    <div className="wrap-980" style={{ padding: "var(--s-8) var(--s-5)" }}>
       <div
         style={{
           display: "grid",

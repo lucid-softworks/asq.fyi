@@ -15,7 +15,11 @@ import type {
   TagCount,
 } from "./types";
 
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+/**
+ * Base URL for the API. Same-origin now that the TanStack Start app hosts
+ * the HTTP API and the UI together. Empty string means relative paths.
+ */
+const BASE = "";
 
 export class ApiRequestError extends Error {
   constructor(
@@ -98,7 +102,7 @@ export const api = {
     return request<void>("/auth/logout", { method: "POST" });
   },
   loginUrl(handle: string) {
-    return `${BASE}/auth/login?handle=${encodeURIComponent(handle)}`;
+    return `/auth/login?handle=${encodeURIComponent(handle)}`;
   },
   createQuestion(input: CreateQuestionInput) {
     return request<{ uri: string; cid: string; authorDid: string }>(

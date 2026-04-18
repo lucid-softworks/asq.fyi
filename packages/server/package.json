@@ -1,0 +1,53 @@
+{
+  "name": "@asq/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./env": "./src/env.ts",
+    "./db": "./src/db/client.ts",
+    "./db/schema": "./src/db/schema.ts",
+    "./db/queries/questions": "./src/db/queries/questions.ts",
+    "./db/queries/profiles": "./src/db/queries/profiles.ts",
+    "./db/queries/tags": "./src/db/queries/tags.ts",
+    "./db/queries/search": "./src/db/queries/search.ts",
+    "./atproto/write": "./src/atproto/write.ts",
+    "./atproto/profile": "./src/atproto/profile.ts",
+    "./atproto/uri": "./src/atproto/uri.ts",
+    "./analytics/track": "./src/analytics/track.ts",
+    "./analytics/trending": "./src/analytics/trending.ts",
+    "./analytics/scheduler": "./src/analytics/scheduler.ts",
+    "./analytics/salt": "./src/analytics/salt.ts",
+    "./analytics/rollup": "./src/analytics/rollup.ts",
+    "./jetstream/handlers": "./src/jetstream/handlers.ts",
+    "./jetstream/collections": "./src/jetstream/collections.ts",
+    "./jetstream/cursor": "./src/jetstream/cursor.ts",
+    "./jetstream/types": "./src/jetstream/types.ts",
+    "./oauth/client": "./src/oauth/client.ts",
+    "./oauth/stores": "./src/oauth/stores.ts",
+    "./oauth/keys": "./src/oauth/keys.ts",
+    "./lib/rate-limit": "./src/lib/rate-limit.ts",
+    "./lib/ip-rate-limit": "./src/lib/ip-rate-limit.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "db:generate": "bun --env-file=../../.env run -- drizzle-kit generate",
+    "db:migrate": "bun --env-file=../../.env run src/scripts/migrate.ts",
+    "db:studio": "bun --env-file=../../.env run -- drizzle-kit studio"
+  },
+  "dependencies": {
+    "@asq/lexicons": "workspace:*",
+    "@asq/shared": "workspace:*",
+    "@atproto/api": "^0.19.9",
+    "@atproto/oauth-client-node": "^0.3.17",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.2",
+    "postgres": "^3.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.13",
+    "@types/node": "^25.6.0",
+    "drizzle-kit": "^0.31.10"
+  }
+}
