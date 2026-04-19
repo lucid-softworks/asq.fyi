@@ -11,20 +11,29 @@
   --ink-faint: #a89a8a;
   --rule: #1a1612;
 
-  /* accents */
-  --red: #c8311a;
-  --red-deep: #962112;
-  --mustard: #d4a017;
-  --mustard-deep: #a87d0a;
-  --teal: #3a7d7b;
-  --teal-deep: #245553;
-  --plum: #6b3556;
+  /* accents — slightly desaturated so colored-on-paper reads as print, not sticker */
+  --red: #b84230;
+  --red-deep: #8c2e1f;
+  --mustard: #c8a02a;
+  --mustard-deep: #9c7818;
+  --teal: #4a7f7d;
+  --teal-deep: #335a58;
+  --plum: #6d4560;
 
   /* surfaces */
   --card: #fbf6e8;
   --card-2: #f0e4c5;
   --shadow: rgba(26, 22, 18, 1);
   --highlight: #fff8e1;
+
+  /* paper grades — replace the old gold/silver/bronze metal ranks */
+  --grade-cream: #efe1a8;   /* premium / top tier — warm cream */
+  --grade-bond:  #e4d7b2;   /* mid tier — business paper */
+  --grade-kraft: #d4bb95;   /* entry tier — natural light brown */
+
+  /* TODO: the display/mono fonts disagree on glyph widths for ★ ● ▲ ▼ × —
+     bring your own SVG icon set (or pick a font with a complete symbol
+     range) when we have budget. */
 
   /* type */
   --font-display: "VT323", "Courier New", monospace;
@@ -196,9 +205,10 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: var(--t-xs);
+  line-height: 1;
   padding: 3px 8px 2px;
   border: var(--bd-thin);
   background: var(--paper-2);
@@ -208,14 +218,23 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
   white-space: nowrap;
 }
 .chip:hover { background: var(--mustard); color: var(--ink); border-color: var(--ink); }
-.chip--red { background: var(--red); color: var(--paper); border-color: var(--ink); }
-.chip--teal { background: var(--teal); color: var(--paper); border-color: var(--ink); }
-.chip--mustard { background: var(--mustard); color: var(--ink); }
-.chip--plum { background: var(--plum); color: var(--paper); }
-.chip--ghost { background: transparent; }
+/* on colored chips the hard black border competes with the fill — tone it
+   to a darker shade of the fill so the chip reads as one solid shape. */
+.chip--red    { background: var(--red);    color: var(--paper); border-color: var(--red-deep); }
+.chip--teal   { background: var(--teal);   color: var(--paper); border-color: var(--teal-deep); }
+.chip--mustard { background: var(--mustard); color: var(--ink);  border-color: var(--mustard-deep); }
+.chip--plum   { background: var(--plum);   color: var(--paper); border-color: #4e2f42; }
+.chip--ghost  { background: transparent; }
 
-/* topic chip — has the # built in via ::before */
-.topic::before { content: "#"; opacity: 0.6; margin-right: -2px; }
+/* topic chip — `#` glyph is optically low + wide, nudge it up and tighten
+   the space between it and the label so it reads as one token. */
+.topic::before {
+  content: "#";
+  opacity: 0.55;
+  margin-right: -1px;
+  transform: translateY(-0.06em);
+  display: inline-block;
+}
 
 /* ============ AVATAR + HANDLE ============ */
 .avatar {
@@ -226,8 +245,12 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* VT323's baseline floats above the box center — pin with line-height:1
+     and nudge a hair so the initial glyph optically centers. */
   font-family: var(--font-display);
   font-size: var(--t-lg);
+  line-height: 1;
+  padding-top: 2px;
   color: var(--ink);
   flex-shrink: 0;
   overflow: hidden;
@@ -249,7 +272,10 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 .handle:hover .name { color: var(--red); }
 .handle:hover { background: transparent; }
 
-/* ============ BADGES / REP ============ */
+/* ============ BADGES / REP ============
+   Paper-grade tiers rather than metal ranks — "cream" beats "gold" as a
+   metaphor for a palette that lives on newsprint. All three keep dark
+   ink text so the tier reads as a slip of paper rather than a sticker. */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -259,10 +285,11 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
   padding: 1px 5px;
   border: 1px solid var(--ink);
   background: var(--paper);
+  color: var(--ink);
 }
-.badge--gold { background: var(--mustard); }
-.badge--silver { background: #d4d0c4; }
-.badge--bronze { background: #c89668; color: var(--paper); }
+.badge--cream { background: var(--grade-cream); }
+.badge--bond  { background: var(--grade-bond); }
+.badge--kraft { background: var(--grade-kraft); }
 .badge::before { content: "★"; font-size: 9px; line-height: 1; }
 
 .rep {
@@ -683,12 +710,12 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 .crumbs__row { display: flex; align-items: center; flex-wrap: wrap; }
 
 /* ============ SECTION HEAD ============ */
-.section { padding: var(--s-8) 0; border-bottom: var(--bd); }
+.section { padding: var(--s-7) 0; border-bottom: var(--bd); }
 .section__head {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: var(--s-6);
+  margin-bottom: var(--s-5);
   gap: var(--s-5);
   flex-wrap: wrap;
 }
@@ -752,7 +779,7 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 
 /* ============ HERO ============ */
 .hero {
-  padding: var(--s-8) 0 var(--s-7);
+  padding: var(--s-7) 0 var(--s-6);
   border-bottom: var(--bd);
   position: relative;
   overflow: hidden;
@@ -801,9 +828,9 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 .hero__lede {
   font-family: var(--font-serif);
   font-size: var(--t-xl);
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--ink-2);
-  margin: var(--s-5) 0 var(--s-5);
+  margin: var(--s-4) 0 var(--s-4);
   max-width: 32ch;
   text-wrap: pretty;
 }
@@ -947,7 +974,8 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
   font-family: var(--font-serif);
   font-weight: 700;
   font-size: clamp(26px, 4vw, 42px);
-  line-height: 1.15;
+  /* bigger type → tighter relative leading */
+  line-height: 1.08;
   margin: 0 0 var(--s-4);
   text-wrap: balance;
 }
@@ -1426,26 +1454,37 @@ a:hover { background: var(--red); color: var(--paper); border-bottom-color: var(
 }
 .tag-token {
   display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
+  gap: 0;
   background: var(--mustard);
   color: var(--ink);
-  border: 1px solid var(--ink);
+  border: 1px solid var(--mustard-deep);
   font-family: var(--font-mono);
   font-size: var(--t-xs);
-  padding: 2px 6px;
+  padding: 0 0 0 6px;
+  overflow: hidden;
 }
+/* the × is an action; the text is a label. Split them with a rule and a
+   tappable square so they don't read as one blob of chip. */
 .tag-token button {
   background: transparent;
   border: 0;
+  border-left: 1px solid var(--mustard-deep);
+  margin-left: 4px;
   color: var(--ink);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: var(--t-xs);
-  padding: 0;
+  font-size: 13px;
   line-height: 1;
+  padding: 2px 6px;
+  min-width: 22px;
+  align-self: stretch;
 }
-.tag-token button:hover { color: var(--red); }
+.tag-token button:hover {
+  background: var(--red);
+  color: var(--paper);
+  border-left-color: var(--red-deep);
+}
 
 /* counter */
 .counter {
